@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#1e40af">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -103,5 +105,19 @@
                 });
             });
     </script>
+    
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(registration => {
+              console.log('Service Worker registrado com sucesso:', registration.scope);
+            })
+            .catch(err => {
+              console.log('Falha ao registrar Service Worker:', err);
+            });
+        });
+      }
+</script>
 </body>
 </html>
