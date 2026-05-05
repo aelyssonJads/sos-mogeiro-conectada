@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <title>SOS Mogeiro Conectado</title>
+</head>
+<body class="bg-gray-100 font-sans p-4" x-data="{ openAjuda: false, openDoar: false }">
+
+    <header class="bg-blue-800 text-white p-4 rounded-xl shadow-lg mb-4 text-center">
+        <h1 class="text-xl font-bold">SOS MOGEIRO CONECTADO</h1>
+        <p class="text-sm opacity-90">Painel de Transparência de Donativos e Abrigos</p>
+    </header>
+
+    <div id="status-texto" class="bg-green-700 text-white p-3 rounded-lg text-center font-bold mb-4">
+        Carregando...
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 mb-6">
+        <button @click="openAjuda = true" class="bg-red-600 text-white p-3 rounded-lg font-bold shadow-md">PRECISO DE AJUDA</button>
+        <button @click="openDoar = true" class="bg-yellow-500 text-black p-3 rounded-lg font-bold shadow-md">QUERO DOAR</button>
+    </div>
+
+    <div x-show="openAjuda" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" x-cloak>
+        <div class="bg-white p-6 rounded-2xl w-full max-w-sm text-center shadow-2xl">
+            <h2 class="text-xl font-bold mb-4">Formulário de Emergência</h2>
+            <a href="LINK_DO_SEU_GOOGLE_FORMS" target="_blank" class="block bg-red-600 text-white py-3 rounded-lg font-bold mb-3">Abrir Formulário</a>
+            <button @click="openAjuda = false" class="text-gray-500 underline text-sm">Fechar</button>
+        </div>
+    </div>
+
+    <div x-show="openDoar" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" x-cloak>
+        <div class="bg-white p-6 rounded-2xl w-full max-w-sm text-center shadow-2xl">
+            <h2 class="text-xl font-bold mb-4">Chave PIX</h2>
+            <p class="mb-4 font-mono font-bold text-blue-800">sos.mogeiro@pix</p>
+            <button @click="openDoar = false" class="text-gray-500 underline text-sm">Fechar</button>
+        </div>
+    </div>
+
+    <section class="bg-white p-4 rounded-xl shadow-sm mb-6">
+        <h2 class="font-bold mb-3 border-b pb-1">Necessidades Urgentes</h2>
+        <div id="container-necessidades"></div>
+    </section>
+
+    <section class="bg-white p-4 rounded-xl shadow-sm mt-6">
+        <h2 class="font-bold mb-3">Mapa de Ocorrências</h2>
+        <div id="map" class="h-64 w-full rounded-lg"></div>
+    </section>
+
+    <section class="bg-white p-4 rounded-xl shadow-sm">
+        <h2 class="font-bold mb-3 border-b pb-1">Transparência Financeira (R$)</h2>
+        <div class="grid grid-cols-1 gap-4">
+            <div>
+                <div id="valor-arrecadado" class="text-2xl font-bold text-green-700">R$ 0,00</div>
+                <p class="text-xs text-gray-500 uppercase font-semibold">Total Arrecadado</p>
+            </div>
+            <div>
+                <div id="valor-gastos" class="text-2xl font-bold text-red-600">R$ 0,00</div>
+                <p class="text-xs text-gray-500 uppercase font-semibold">Total de Gastos</p>
+            </div>
+            <div class="pt-2 border-t">
+                <div id="valor-saldo" class="text-2xl font-bold text-blue-800">R$ 0,00</div>
+                <p class="text-xs text-gray-500 uppercase font-semibold">Saldo em Caixa</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const dados = {
+            "status": "Operação Ativa: Chuvas em Mogeiro",
+            "necessidades": [
+                { "nome": "Água Potável", "atual": 250, "total": 500, "cor": "bg-blue-500" },
+                { "nome": "Cestas Básicas", "atual": 80, "total": 100, "cor": "bg-green-500" },
+                { "nome": "Colchões", "atual": 15, "total": 50, "cor": "bg-yellow-500" }
+            ],
+            "financeiro": { 
+                "arrecadado": 15400.00,
+                "gastos": 5200.50
+            },
+            "locais_mapa": [
+                { "nome": "Escola Municipal", "tipo": "abrigo", "lat": -7.3770, "lng": -35.5350 },
+                { "nome": "Igreja Matriz", "tipo": "coleta", "lat": -7.3790, "lng": -35.5380 },
+                { "nome": "Ponte do Rio X", "tipo": "critico", "lat": -7.3820, "lng": -35.5420 }
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Atualiza Status
+            document.getElementById('status-texto').innerText = '● ' + dados.status;
+            
+            // 2. Atualiza Financeiro (Cálculos e Formatação)
+            const fin = dados.financeiro;
+            const saldo = fin.arrecadado - fin.gastos;
+            
+            document.getElementById('valor-arrecadado').innerText = 'R$ ' + fin.arrecadado.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            document.getElementById('valor-gastos').innerText = 'R$ ' + fin.gastos.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            document.getElementById('valor-saldo').innerText = 'R$ ' + saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+
+            // 3. Renderiza Necessidades Dinamicamente
+            const container = document.getElementById('container-necessidades');
+            dados.necessidades.forEach(item => {
+                const percentual = (item.atual / item.total) * 100;
+                container.innerHTML += `
+                    <div class="mb-3">
+                        <div class="flex justify-between text-sm mb-1">
+                            <span>${item.nome}</span>
+                            <span>${item.atual} / ${item.total}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
+                            <div class="${item.cor} h-full" style="width: ${percentual}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+        });
+    </script>
+</body>
+</html>

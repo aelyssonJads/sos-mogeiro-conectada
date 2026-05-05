@@ -1,0 +1,19 @@
+{
+  "status": "Operação Ativa: Chuvas em Mogeiro",
+  "necessidades": [
+      { "nome": "Água Potável", "atual": 250, "total": 500, "cor": "bg-blue-500" },
+      { "nome": "Cestas Básicas", "atual": 80, "total": 100, "cor": "bg-green-500" },
+      { "nome": "Colchões", "atual": 15, "total": 50, "cor": "bg-yellow-500" }
+  ],
+  "financeiro": { 
+      "arrecadado": 15400.00,
+      "gastos": 5200.50
+  },
+  "locais_mapa": [
+      { "nome": "Escola Iraci Rodrigues", "tipo": "abrigo e coleta", "lat": -7.307771646547476, "lng": -35.47578781802605 },
+      { "nome": "Ponto crítico", "tipo": "critico", "lat": -7.308374303549453, "lng": 35.47699062219754 },
+      { "nome": "Ponto Salgado de São Félix", "tipo": "critico", "lat": -7.353944563972863, "lng": -35.44330983004309 },
+      { "nome": "Ponte de Ingá", "tipo": "critico", "lat": -7.2890876248702785, "lng": -35.60655025360877 },
+      { "nome": "Unidade Mista de Saúde", "tipo": "atendimento de saúde", "lat": -7.3041005913816575, "lng": -35.478681846574815 }
+  ]
+}
